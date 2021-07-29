@@ -5,34 +5,38 @@ using UnityEngine;
 public class WaypointAI : MonoBehaviour
 {
     [SerializeField] private float speed;
-    [SerializeField] private GameObject goal;
-    [SerializeField] private GameObject goal1;
-    [SerializeField] private GameObject goal2;
-    [SerializeField] private float distanceCutoff;
+    [SerializeField] private GameObject[] goal;
+    private int goalIndex = 0;
+    private GameObject currentGoal;
     // Start is called before the first frame update
     void Start()
     {
-        goal = goal1;
-        distanceCutoff = 0.01f;
-        speed = 5.0f;
+        currentGoal = goal[goalIndex];
+        speed = 5;
     }
 
     // Update is called once per frame
     void Update()
     {
-        float distance = Vector2.Distance(transform.position, goal.transform.position);
+        float distance = Vector2.Distance(transform.position, currentGoal.transform.position);
 
-        if (distance >= distanceCutoff)
+        if (distance >= 0.01f)
         {
-            Vector2 direction = (goal.transform.position - transform.position).normalized;
+            Vector2 direction = (currentGoal.transform.position - transform.position).normalized;
             Vector2 position = transform.position;
             position.x = position.x + (direction.x * speed * Time.deltaTime);
             position.y = position.y + (direction.y * speed * Time.deltaTime);
             transform.position = position;
         }
+        else if (goalIndex < goal.Length)
+        {
+            goalIndex++;
+            currentGoal = goal[goalIndex];
+        }
         else
         {
-            goal = goal2;
+            goalIndex = 0;
+            currentGoal = goal[goalIndex];
         }
     }
 }
