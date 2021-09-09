@@ -1,59 +1,85 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class WaypointAI : MonoBehaviour
 {
-    [SerializeField] private float speed;
-    [SerializeField] private GameObject[] goal;
+    public float speed;
+    public GameObject[] goal;
     private int goalIndex = 0;
     private GameObject currentGoal;
-    // Start is called before the first frame update
+    public bool isAIMoving = true;
+    public GameObject target;
+    private GameObject player;
+    public StateMachineScript aiStateMachine;
+
     void Start()
     {
         currentGoal = goal[goalIndex];
-        speed = 5;
+        speed = 2;
+        Player playerFound = FindObjectOfType<Player>();
+        if (playerFound != null)
+        {
+            player = playerFound.gameObject;
+        }
     }
-
-    // Update is called once per frame
     void Update()
     {
-        float distance = Vector2.Distance(transform.position, currentGoal.transform.position);
-
-        if (distance >= 0.01f)
+        if (isAIMoving==false)
         {
-            Vector2 direction = (currentGoal.transform.position - transform.position).normalized;
-            Vector2 position = transform.position;
-            position.x = position.x + (direction.x * speed * Time.deltaTime);
-            position.y = position.y + (direction.y * speed * Time.deltaTime);
-            transform.position = position;
+            return;
         }
-        else if (goalIndex < goal.Length)
+        if (target==null)
         {
-            goalIndex++;
-            currentGoal = goal[goalIndex];
+            Wander(currentGoal, speed);
         }
         else
         {
-            goalIndex = 0;
-            currentGoal = goal[goalIndex];
+            Chase(target, speed);
         }
     }
+    void Chase(GameObject goal, float currentSpeed)
+    {
+        Vector2 direction = (goal.transform.position - transform.position).normalized;
+        Vector2 position = transform.position;
+        position = position + (direction * currentSpeed * Time.deltaTime);
+        transform.position = position;
+    }
+    void Wander(GameObject goal, float currentSpeed)
+    {
+        float distance = Vector2.Distance(transform.position, currentGoal.transform.position);
+        if (distance >= 0.01f)
+        {
+            Chase(currentGoal, speed);
+        }
+        else
+        {
+            if (player.activeSelf)
+            {
+                NextGoal();
+            }
+            else
+            {
+                NextGoalReverse();
+            }
+            
+        }
+    }
+    void NextGoal()
+    {
+        goalIndex++;
+        if  (goalIndex > (goal.Length - 1))
+        {
+            goalIndex = 0;
+        }
+        currentGoal = goal[goalIndex];
+    }
+    void NextGoalReverse()
+    {
+        goalIndex--;
+        if (goalIndex < 0)
+        {
+            goalIndex = (goal.Length-1);
+        }
+        currentGoal = goal[goalIndex];
+    }
 }
-/*speedX = 0f;
-        speedY = 0f;
-        if (Input.GetKey(KeyCode.W))
-        {
-            speedY = 1f;
-        }if (Input.GetKey(KeyCode.S))
-        {
-            speedY = -1f;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            speedX = -1f;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            speedX = 1f;
-        }*/

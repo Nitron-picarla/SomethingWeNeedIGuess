@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class MessingWithArrays : MonoBehaviour
 {
-    public string[] myStringArray;
-    public int x = 0;
+  //  public string[] myStringArray;
+   // public int x = 0;
     void Start()
     {
-        print(myStringArray[x]); 
+      //  print(myStringArray[x]); 
     }
 }
